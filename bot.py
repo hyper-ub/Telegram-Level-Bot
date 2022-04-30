@@ -26,7 +26,7 @@ from pymongo import MongoClient
 import os
 
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("TOKEN")
 MONGO_URL = os.environ.get("MONGO_URL")
 Chat_Group = [] #chatid
 
