@@ -116,7 +116,7 @@ def rank(update: Update, context: CallbackContext):
 
 
 def main():
-    updater = Updater(TOKEN)
+    updater = Updater(BOT_TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("rank", rank))
     dispatcher.add_handler(MessageHandler(Filters.all & Filters.chat_type.groups , level))
