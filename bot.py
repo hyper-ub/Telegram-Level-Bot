@@ -18,25 +18,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from pyrogram import Client , filters
+import logging
+
+from telegram import Update,ParseMode
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from pymongo import MongoClient
 import os
 
-API_ID = os.environ.get("API_ID")
-API_HASH = os.environ.get("API_HASH")
+
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 MONGO_URL = os.environ.get("MONGO_URL")
-
-
 Chat_Group = [-1001773806532]
 
-
-bot = Client(
-    "Level" ,
-    api_id = API_ID ,
-    api_hash = API_HASH ,
-    bot_token = BOT_TOKEN
+# Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
+logger = logging.getLogger("tlb")
+
 
 
 
@@ -46,21 +45,11 @@ levelnum = [2,5,15,25,35,50,70,100]
 
 
 
-
-@bot.on_message(
-    (filters.document
-     | filters.text
-     | filters.photo
-     | filters.sticker
-     | filters.animation
-     | filters.video)
-    & ~filters.private,
-    group=8,
-)
-async def level(client, message):
+def level(update: Update, context: CallbackContext):
+    message = update.effective_message
     chat = message.chat.id
     user_id = message.from_user.id    
-
+    user = update.effective_user
     leveldb = MongoClient(MONGO_URL)
     
     level = leveldb["LevelDb"]["Level"] 
@@ -70,7 +59,7 @@ async def level(client, message):
 
         if not message.from_user.is_bot:
             if xpnum is None:
-                newxp = {"level": user_id, "xp": 10}
+                newxp = {message = update.effective_message"level": user_id, "xp": 10}
                 level.insert_one(newxp)   
                     
             else:
@@ -84,22 +73,21 @@ async def level(client, message):
                     l += 1
                 xp -= ((50*((l-1)**2))+(50*(l-1)))
                 if xp == 0:
-                    await message.reply_text(f"🌟 {message.from_user.mention}, You have reached level {l}**, Nothing can stop you on your way!")
+                    message.reply_text(f"🌟 {user.mention_html()}, You have reached level {l}**, Nothing can stop you on your way!",parse_mode=ParseMode.HTML)
     
                     for lv in range(len(levelname)) and range(len(levellink)):
                             if l == levelnum[lv]:            
                                 Link = f"{levellink[lv]}"
-                                await message.reply_video(video=Link, caption=f"{message.from_user.mention}, You have reached Rank Name **{levelname[lv]}**")
+                                message.reply_video(video=Link, caption=f"{user.mention_html()}, You have reached Rank Name **{levelname[lv]}**",parse_mode=ParseMode.HTML)
                   
 
                                
-@bot.on_message(
-    filters.command("rank", prefixes=["/", ".", "?", "-"])
-    & ~filters.private)
-async def rank(client, message):
+
+def rank(update: Update, context: CallbackContext):
+    message = update.effective_message
     chat = message.chat.id
     user_id = message.from_user.id    
-    
+    user = update.effective_user
     leveldb = MongoClient(MONGO_URL)
     
     level = leveldb["LevelDb"]["Level"] 
@@ -120,9 +108,21 @@ async def rank(client, message):
             r += 1
             if xpnum["level"] == k["level"]:
                 break                     
-        await message.reply_text(f"{message.from_user.mention} Level Info:\nLevel: {l}\nProgess: {xp}/{int(200 *((1/2) * l))}\n Ranking: {r}")
+        message.reply_text(f"{user.mention_html()},Level Info:\nLevel: {l}\nProgess: {xp}/{int(200 *((1/2) * l))}\n Ranking: {r}",parse_mode=ParseMode.HTML)
 
 
 
 
-bot.run() 
+
+
+def main():
+    updater = Updater("BOT_TOKEN")
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(CommandHandler("rank", rank))
+    dispatcher.add_handler(MessageHandler(Filters.all & Filters.chat_type.groups , level))
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
