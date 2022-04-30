@@ -73,7 +73,7 @@ def level(update: Update, context: CallbackContext):
                     l += 1
                 xp -= ((50*((l-1)**2))+(50*(l-1)))
                 if xp == 0:
-                    message.reply_text(f"🌟 {user.mention_html()}, You have reached level {l}**, Nothing can stop you on your way!",parse_mode=ParseMode.HTML)
+                    message.reply_text(f"🌟 {user.mention_html()}, You have reached level {l}, Nothing can stop you on your way!",parse_mode=ParseMode.HTML)
     
                     for lv in range(len(levelname)) and range(len(levellink)):
                             if l == levelnum[lv]:            
