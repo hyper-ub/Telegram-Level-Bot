@@ -78,7 +78,7 @@ def level(update: Update, context: CallbackContext):
                     for lv in range(len(levelname)) and range(len(levellink)):
                             if l == levelnum[lv]:            
                                 Link = f"{levellink[lv]}"
-                                message.reply_video(video=Link, caption=f"{user.mention_html()}, You have reached Rank Name **{levelname[lv]}**",parse_mode=ParseMode.HTML)
+                                message.reply_video(video=Link, caption=f"{user.mention_html()}, You have reached Rank Name {levelname[lv]}",parse_mode=ParseMode.HTML)
                   
 
                                
@@ -116,7 +116,7 @@ def rank(update: Update, context: CallbackContext):
 
 
 def main():
-    updater = Updater("BOT_TOKEN")
+    updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("rank", rank))
     dispatcher.add_handler(MessageHandler(Filters.all & Filters.chat_type.groups , level))
