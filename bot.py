@@ -59,7 +59,7 @@ def level(update: Update, context: CallbackContext):
 
         if not message.from_user.is_bot:
             if xpnum is None:
-                newxp = {message = update.effective_message"level": user_id, "xp": 10}
+                newxp = {"level": user_id, "xp": 10}
                 level.insert_one(newxp)   
                     
             else:
